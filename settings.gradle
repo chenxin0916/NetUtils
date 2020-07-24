@@ -1,0 +1,4 @@
+include ':netlib_kotlin'
+include ':netlib_java'
+include ':app'
+rootProject.name = "NetUtils"
