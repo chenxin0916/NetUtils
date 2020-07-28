@@ -5,8 +5,6 @@ import com.ihsanbal.logging.LoggingInterceptor;
 import com.yinguojiaoyu.netlib.request.GetRequest;
 import com.yinguojiaoyu.netlib.request.PostRequest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -16,7 +14,7 @@ import static android.util.Log.VERBOSE;
 public class Net {
 
     public final OkHttpClient okHttpClient;
-    private static URI netBaseUrl = null;
+    private static String netBaseUrl = null;
 
     private static final class InstanceClass {
         private static Net instance = new Net();
@@ -36,10 +34,10 @@ public class Net {
     }
 
     public static Net getInstance(){
-        return InstanceClass.instance ;
+        return InstanceClass.instance;
     }
 
-    public static URI getNetBaseUrl() {
+    public static String getNetBaseUrl() {
         return netBaseUrl;
     }
 
@@ -48,11 +46,7 @@ public class Net {
             throw new RuntimeException("base url must start with http or https");
         }
 
-        try {
-            netBaseUrl = new URI(baseUrl);
-        } catch (URISyntaxException  e) {
-            e.printStackTrace();
-        }
+        netBaseUrl = baseUrl;
     }
 
     public static  GetRequest get(String url) {

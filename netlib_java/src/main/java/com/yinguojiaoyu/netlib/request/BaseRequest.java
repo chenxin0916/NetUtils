@@ -5,6 +5,7 @@ import com.yinguojiaoyu.netlib.common.Net;
 import com.yinguojiaoyu.netlib.common.ResponseConvert;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -18,30 +19,59 @@ import okhttp3.Response;
 
 public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
     protected  Request.Builder requestBuilder;
-    protected HttpUrl.Builder httpUrlBuilder;
+    protected String requestUrl;
 
+    protected HashMap<String,Object> paramsMap;
     public BaseRequest(String url) {
         requestBuilder = new Request.Builder();
-        httpUrlBuilder = new HttpUrl.Builder();
         if (Net.getNetBaseUrl() == null) {
             throw new RuntimeException("Base url is null");
         }
-        httpUrlBuilder.scheme(Net.getNetBaseUrl().getScheme());
-        httpUrlBuilder.host(Net.getNetBaseUrl().getHost());
 
-        String[] UrlSplit = url.split("/");
-        for (String s : UrlSplit) {
-            httpUrlBuilder.addPathSegment(s);
-        }
+        requestUrl = Net.getNetBaseUrl().concat(url);
     }
 
-    public BaseRequest host(String host){
-        httpUrlBuilder.host(host);
-        return this;
-    }
 
     public BaseRequest addHeader(String name,String value){
         requestBuilder.addHeader(name,value);
+        return this;
+    }
+
+    public synchronized void initParamMap(){
+        if (paramsMap == null) {
+            paramsMap = new HashMap<>();
+        }
+    }
+
+    public BaseRequest params(String key,String value){
+        initParamMap();
+//        httpUrlBuilder.addQueryParameter(key,value);
+        paramsMap.put(key,value);
+        return this;
+    }
+
+    public BaseRequest params(String key,int value){
+        initParamMap();
+        paramsMap.put(key,value);
+        return this;
+    }
+
+    public BaseRequest params(String key,long value){
+        initParamMap();
+        paramsMap.put(key,value);
+        return this;
+    }
+
+    public BaseRequest params(String key,boolean value){
+        initParamMap();
+        paramsMap.put(key,value);
+        return this;
+    }
+
+
+    public BaseRequest params(String key,double value){
+        initParamMap();
+        paramsMap.put(key,value);
         return this;
     }
 
@@ -58,11 +88,11 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
         emitter.onNext(execute);
     }
 
-    protected @NonNull Observable<Response> getObservable(){
+    public @NonNull Observable<Response> getObservable(){
         return Observable.create(this);
     }
 
-    protected @NonNull <T> Observable<T> getObservable(Type type){
+    public @NonNull <T> Observable<T> getObservable(Type type){
         return Observable.create(this)
                 .map(new ResponseConvert<T>(type) {});
     }
