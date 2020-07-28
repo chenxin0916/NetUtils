@@ -17,14 +17,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Net.setBaseUrl("https://app.taohua6.com");
+        Net.setBaseUrl("https://www.baidu.com");
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setPhone("15201426271");
         loginRequest.setMsgCode("9999");
         loginRequest.setDeviceType("app");
         findViewById(R.id.view_text).setOnClickListener(v -> {
 
-            Net.post("app/api/app/v1/account/login")
+            Net.post("app/v1/account/login")
                     .params(loginRequest)
                     .execute(new ResponseConvert<BaseServiceMode<LoginInfo>>() {
                         @Override
