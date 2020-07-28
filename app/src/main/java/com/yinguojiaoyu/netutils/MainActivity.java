@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
             Net.<String>get("app/api/app/account/login/sendMsgCode/18576601625")
                     .addHeader("device","app")
                     .params("phone","hahahahs")
-                    .buildRequest(new NetCallBack<String>() {
+                    .execute(new NetCallBack<String>() {
                         @Override
                         public void onSuccess(String s) {
 
