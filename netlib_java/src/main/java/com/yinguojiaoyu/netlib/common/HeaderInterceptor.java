@@ -14,9 +14,6 @@ public class HeaderInterceptor implements Interceptor {
         builder.addHeader("deviceType", "app");
         builder.addHeader("Content-Type", "application/json");
         builder.addHeader("version", "2.3");
-
-
-
         return chain.proceed(builder.build());
     }
 }

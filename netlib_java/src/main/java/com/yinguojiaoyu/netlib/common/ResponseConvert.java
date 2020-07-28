@@ -1,18 +1,26 @@
 package com.yinguojiaoyu.netlib.common;
 
+import android.text.TextUtils;
+
 import com.google.gson.internal.$Gson$Types;
 import com.yinguojiaoyu.netlib.GsonUtils;
+import com.yinguojiaoyu.netlib.cache.CacheMode;
+import com.yinguojiaoyu.netlib.cache.CacheOperate;
+import com.yinguojiaoyu.netlib.cache.CacheType;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.ConnectException;
+import java.util.Objects;
 
 import io.reactivex.rxjava3.functions.Function;
+import okhttp3.CacheControl;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public abstract class ResponseConvert<T> implements Function<Response,T> {
     private Type type;
+    private CacheType cacheType = null;
 
     public ResponseConvert(Type type) {
         this.type = type;
@@ -33,11 +41,29 @@ public abstract class ResponseConvert<T> implements Function<Response,T> {
             throw new ConnectException();
         }
         T data;
-        data = GsonUtils.getInstance().parseJson(body.charStream(),type);
+        String string = body.string();
+        data =  GsonUtils.getInstance().getGson().fromJson(string,type);
+
+        if ( cacheType == CacheType.IF_NONE_CACHE_REQUEST || cacheType == CacheType.FIRST_CACHE_THEN_REQUEST) {
+            String cacheKey = response.request().tag(String.class);
+            if (!TextUtils.isEmpty(cacheKey)){
+                CacheMode newCacheMode = new CacheMode();
+                newCacheMode.setCacheKey(cacheKey);
+                newCacheMode.setContent(string);
+                newCacheMode.setSaveTime(System.currentTimeMillis());
+
+                if ( CacheOperate.getInstance().queryCache(cacheKey) != null) {
+                    CacheOperate.getInstance().updateCache(newCacheMode);
+                }else {
+                    CacheOperate.getInstance().addCache(newCacheMode);
+                }
+            }
+        }
+
         if (data == null) {
             throw new Exception("Parse json failed,data is null");
         }
-
+        string = null;
         return data;
     }
 
@@ -51,6 +77,9 @@ public abstract class ResponseConvert<T> implements Function<Response,T> {
         return $Gson$Types.canonicalize(parameterized.getActualTypeArguments()[0]);
     }
 
+    public void setCacheMode(CacheType cacheType){
+        this.cacheType = cacheType;
+    }
     public void onPrepare(){}
     public void onSuccess(T t){}
     public void onFailed(Throwable throwable){}

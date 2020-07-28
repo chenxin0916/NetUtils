@@ -2,15 +2,26 @@ package com.yinguojiaoyu.netlib.request;
 
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.yinguojiaoyu.netlib.cache.CacheMode;
 import com.yinguojiaoyu.netlib.cache.CacheOperate;
 import com.yinguojiaoyu.netlib.cache.CacheType;
+import com.yinguojiaoyu.netlib.common.HttpUtils;
 import com.yinguojiaoyu.netlib.common.Net;
 import com.yinguojiaoyu.netlib.common.ResponseConvert;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -20,6 +31,7 @@ import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -88,6 +100,7 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
 
     public BaseRequest cacheKey(String cacheKey){
         this.cacheKey = cacheKey;
+        requestBuilder.tag(String.class,cacheKey);
         return this;
     }
 
@@ -100,34 +113,25 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
 
     @Override
     public void subscribe(@NonNull ObservableEmitter<Response> emitter) throws Throwable {
-        if (TextUtils.isEmpty(cacheKey)) {
-            cacheKey = requestUrl;
-        }
-        CacheMode cacheMode = CacheOperate.getInstance().queryCache(cacheKey);
-        if (cacheMode != null) {
-            String content = cacheMode.getContent();
-            Response.Builder builder = new Response.Builder();
-            builder.body(ResponseBody.create(content,PostRequest.JSON));
-            builder.code(200);
-            emitter.onNext(builder.build());
-            return;
-        }
 
-        Response execute = Net.getInstance().okHttpClient.newCall(buildRequest()).execute();
+        if (mCacheType != CacheType.NO_CACHE) {
+            if (TextUtils.isEmpty(cacheKey)) {
+                String requestCacheKey = HttpUtils.appendCacheKey(requestUrl, paramsMap);
+                this.cacheKey = requestCacheKey;
+                requestBuilder.tag(String.class,requestCacheKey);
+            }
 
-        if (execute.code() == 200 && execute.body() != null) {
-            CacheMode hasMode = CacheOperate.getInstance().queryCache(cacheKey);
-            if (hasMode != null) {
-                CacheOperate.getInstance().updateCache(hasMode);
-            }else {
-                CacheMode newCacheMode = new CacheMode();
-                newCacheMode.setCacheKey(cacheKey);
-                newCacheMode.setContent(execute.body().string());
-                newCacheMode.setSaveTime(System.currentTimeMillis());
-                CacheOperate.getInstance().addCache(newCacheMode);
+            CacheMode cacheMode = CacheOperate.getInstance().queryCache(cacheKey);
+            if (cacheMode != null) {
+                String content = cacheMode.getContent();
+                emitter.onNext(HttpUtils.createCacheResponse(content));
+                if (mCacheType == CacheType.IF_NONE_CACHE_REQUEST) {
+                    return;
+                }
             }
         }
 
+        Response execute = Net.getInstance().okHttpClient.newCall(buildRequest()).execute();
         emitter.onNext(execute);
     }
 
@@ -143,10 +147,12 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public <T>void execute(ResponseConvert<T> responseConvert){
         responseConvert.onPrepare();
+        responseConvert.setCacheMode(mCacheType);
         Observable.create(this)
                 .map(responseConvert)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseConvert::onSuccess, responseConvert::onFailed);
     }
+
 }
