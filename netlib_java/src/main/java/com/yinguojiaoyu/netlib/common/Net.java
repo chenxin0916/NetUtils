@@ -1,10 +1,13 @@
-package com.yinguojiaoyu.netlib;
+package com.yinguojiaoyu.netlib.common;
+
+import android.content.Context;
 
 import com.ihsanbal.logging.Level;
 import com.ihsanbal.logging.LoggingInterceptor;
+import com.yinguojiaoyu.netlib.cache.CacheOperate;
+import com.yinguojiaoyu.netlib.request.GetRequest;
+import com.yinguojiaoyu.netlib.request.PostRequest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -13,8 +16,8 @@ import static android.util.Log.VERBOSE;
 
 public class Net {
 
-    final OkHttpClient okHttpClient;
-    static URI netBaseUrl = null;
+    public final OkHttpClient okHttpClient;
+    private static String netBaseUrl = null;
 
     private static final class InstanceClass {
         private static Net instance = new Net();
@@ -33,25 +36,31 @@ public class Net {
                 .build();
     }
 
-    static Net getInstance(){
-        return InstanceClass.instance ;
+    public static void initCache(Context context) {
+        CacheOperate.getInstance().initCacheDataBase(context);
+    }
+
+    public static Net getInstance(){
+        return InstanceClass.instance;
+    }
+
+    public static String getNetBaseUrl() {
+        return netBaseUrl;
     }
 
     public static void setBaseUrl(String baseUrl){
         if (!baseUrl.startsWith("http")) {
             throw new RuntimeException("base url must start with http or https");
         }
-
-        try {
-            netBaseUrl = new URI(baseUrl);
-        } catch (URISyntaxException  e) {
-            e.printStackTrace();
-        }
+        netBaseUrl = baseUrl;
     }
 
-    public static <T> GetRequest<T> get(String url) {
-        return new GetRequest<T>(url);
+    public static  GetRequest get(String url) {
+        return new GetRequest(url);
     }
 
+    public static PostRequest post(String url) {
+        return new PostRequest(url);
+    }
 
 }

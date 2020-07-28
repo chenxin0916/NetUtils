@@ -1,4 +1,4 @@
-package com.yinguojiaoyu.netlib;
+package com.yinguojiaoyu.netlib.common;
 
 import java.io.IOException;
 
@@ -11,8 +11,12 @@ public class HeaderInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request oldRequest = chain.request();
         Request.Builder builder = oldRequest.newBuilder();
-        builder.addHeader("Content-Type", "application/json;charset=UTF-8");
-        // TODO: 2020/7/22
+        builder.addHeader("deviceType", "app");
+        builder.addHeader("Content-Type", "application/json");
+        builder.addHeader("version", "2.3");
+
+
+
         return chain.proceed(builder.build());
     }
 }

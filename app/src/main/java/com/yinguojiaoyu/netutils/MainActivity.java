@@ -1,11 +1,12 @@
 package com.yinguojiaoyu.netutils;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.yinguojiaoyu.netlib.Net;
-import com.yinguojiaoyu.netlib.NetCallBack;
+import com.yinguojiaoyu.netlib.common.Net;
+import com.yinguojiaoyu.netlib.common.ResponseConvert;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,26 +15,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Net.setBaseUrl("https://app.taohua6.com");
+        Net.initCache(this);
+
         findViewById(R.id.view_text).setOnClickListener(v -> {
 
-            Net.<String>get("app/api/app/account/login/sendMsgCode/18576601625")
-                    .addHeader("device","app")
-                    .params("phone","hahahahs")
-                    .execute(new NetCallBack<String>() {
+
+            Net.post("/app/api/app/v1/account/login")
+                    .params("phone","15201426271")
+                    .params("msgCode","9999")
+                    .params("deviceType","app")
+                    .execute(new ResponseConvert<BaseServiceMode<LoginInfo>>() {
                         @Override
-                        public void onSuccess(String s) {
-
-                        }
-
-                        @Override
-                        public void onFailed() {
-
+                        public void onSuccess(BaseServiceMode<LoginInfo> loginInfoBaseServiceMode) {
+                            Log.i("chenxin",loginInfoBaseServiceMode.getData().getName());
                         }
                     });
         });
-
-
-
     }
-
 }
