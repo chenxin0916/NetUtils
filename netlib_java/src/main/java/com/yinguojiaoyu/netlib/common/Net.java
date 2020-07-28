@@ -1,7 +1,10 @@
 package com.yinguojiaoyu.netlib.common;
 
+import android.content.Context;
+
 import com.ihsanbal.logging.Level;
 import com.ihsanbal.logging.LoggingInterceptor;
+import com.yinguojiaoyu.netlib.cache.CacheOperate;
 import com.yinguojiaoyu.netlib.request.GetRequest;
 import com.yinguojiaoyu.netlib.request.PostRequest;
 
@@ -33,6 +36,10 @@ public class Net {
                 .build();
     }
 
+    public static void initCache(Context context) {
+        CacheOperate.getInstance().initCacheDataBase(context);
+    }
+
     public static Net getInstance(){
         return InstanceClass.instance;
     }
@@ -45,7 +52,6 @@ public class Net {
         if (!baseUrl.startsWith("http")) {
             throw new RuntimeException("base url must start with http or https");
         }
-
         netBaseUrl = baseUrl;
     }
 

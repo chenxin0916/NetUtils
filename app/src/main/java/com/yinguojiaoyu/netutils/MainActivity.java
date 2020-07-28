@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Net.setBaseUrl("https://app.taohua6.com");
+        Net.initCache(this);
 //      LoginRequest loginRequest = new LoginRequest();
 //      loginRequest.setPhone("15201426271");
 //      loginRequest.setMsgCode("9999");

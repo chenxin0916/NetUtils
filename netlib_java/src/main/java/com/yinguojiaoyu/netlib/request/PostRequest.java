@@ -15,7 +15,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class PostRequest extends BaseRequest {
-    private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private Object requestPar = null;
 
     public PostRequest(String url) {
