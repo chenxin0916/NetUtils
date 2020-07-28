@@ -1,7 +1,9 @@
-package com.yinguojiaoyu.netlib;
+package com.yinguojiaoyu.netlib.common;
 
 import com.ihsanbal.logging.Level;
 import com.ihsanbal.logging.LoggingInterceptor;
+import com.yinguojiaoyu.netlib.request.GetRequest;
+import com.yinguojiaoyu.netlib.request.PostRequest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,8 +15,8 @@ import static android.util.Log.VERBOSE;
 
 public class Net {
 
-    final OkHttpClient okHttpClient;
-    static URI netBaseUrl = null;
+    public final OkHttpClient okHttpClient;
+    private static URI netBaseUrl = null;
 
     private static final class InstanceClass {
         private static Net instance = new Net();
@@ -33,8 +35,12 @@ public class Net {
                 .build();
     }
 
-    static Net getInstance(){
+    public static Net getInstance(){
         return InstanceClass.instance ;
+    }
+
+    public static URI getNetBaseUrl() {
+        return netBaseUrl;
     }
 
     public static void setBaseUrl(String baseUrl){
@@ -49,9 +55,12 @@ public class Net {
         }
     }
 
-    public static <T> GetRequest<T> get(String url) {
-        return new GetRequest<T>(url);
+    public static  GetRequest get(String url) {
+        return new GetRequest(url);
     }
 
+    public static PostRequest post(String url) {
+        return new PostRequest(url);
+    }
 
 }
