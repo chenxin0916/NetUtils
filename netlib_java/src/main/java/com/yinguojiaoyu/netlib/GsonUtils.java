@@ -26,8 +26,8 @@ public class GsonUtils {
         return  mGson;
     }
 
-    public <T> T parseJson(Reader reader, Type type){
-        return mGson.fromJson(reader,type);
+    public <T> T parseJson(String json, Type type){
+        return mGson.fromJson(json,type);
     }
 
 

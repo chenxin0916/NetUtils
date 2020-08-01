@@ -24,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
                     .params("phone","15201426271")
                     .params("msgCode","9999")
                     .params("deviceType","app")
-                    .cacheMode(CacheType.FIRST_CACHE_THEN_REQUEST)
+                    .expireTime(60*1000)
+                    .cacheMode(CacheType.IF_NONE_CACHE_REQUEST)
                     .execute(new ResponseConvert<BaseServiceMode<LoginInfo>>() {
                         @Override
                         public void onSuccess(BaseServiceMode<LoginInfo> loginInfoBaseServiceMode) {

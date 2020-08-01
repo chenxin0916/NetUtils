@@ -11,17 +11,8 @@ import com.yinguojiaoyu.netlib.common.HttpUtils;
 import com.yinguojiaoyu.netlib.common.Net;
 import com.yinguojiaoyu.netlib.common.ResponseConvert;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -29,18 +20,15 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import okhttp3.Cache;
-import okhttp3.CacheControl;
-import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
     protected  Request.Builder requestBuilder;
     protected String requestUrl;
     protected CacheType mCacheType = CacheType.NO_CACHE;
     protected String cacheKey = "";
+    protected long expireTime = -1;
 
     protected HashMap<String,Object> paramsMap;
     public BaseRequest(String url) {
@@ -100,7 +88,11 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
 
     public BaseRequest cacheKey(String cacheKey){
         this.cacheKey = cacheKey;
-        requestBuilder.tag(String.class,cacheKey);
+        return this;
+    }
+
+    public BaseRequest expireTime(long milSecond){
+        this.expireTime = milSecond;
         return this;
     }
 
@@ -116,13 +108,10 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
 
         if (mCacheType != CacheType.NO_CACHE) {
             if (TextUtils.isEmpty(cacheKey)) {
-                String requestCacheKey = HttpUtils.appendCacheKey(requestUrl, paramsMap);
-                this.cacheKey = requestCacheKey;
-                requestBuilder.tag(String.class,requestCacheKey);
+                cacheKey = HttpUtils.appendCacheKey(requestUrl,paramsMap);
             }
-
             CacheMode cacheMode = CacheOperate.getInstance().queryCache(cacheKey);
-            if (cacheMode != null) {
+            if (cacheMode != null && !cacheMode.isCacheExpired()) {
                 String content = cacheMode.getContent();
                 emitter.onNext(HttpUtils.createCacheResponse(content));
                 if (mCacheType == CacheType.IF_NONE_CACHE_REQUEST) {
@@ -147,7 +136,9 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public <T>void execute(ResponseConvert<T> responseConvert){
         responseConvert.onPrepare();
-        responseConvert.setCacheMode(mCacheType);
+        CacheMode cachemode = new CacheMode(cacheKey, expireTime, mCacheType);
+        cachemode.generateCacheKey(requestUrl, paramsMap);
+        responseConvert.setCacheMode(cachemode);
         Observable.create(this)
                 .map(responseConvert)
                 .subscribeOn(Schedulers.io())

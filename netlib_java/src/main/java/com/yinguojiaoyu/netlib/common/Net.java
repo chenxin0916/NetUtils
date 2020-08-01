@@ -8,9 +8,12 @@ import com.yinguojiaoyu.netlib.cache.CacheOperate;
 import com.yinguojiaoyu.netlib.request.GetRequest;
 import com.yinguojiaoyu.netlib.request.PostRequest;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 
 import static android.util.Log.VERBOSE;
 
@@ -33,6 +36,7 @@ public class Net {
                         .setLevel(Level.BASIC)
                         .log(VERBOSE)
                         .build())
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .build();
     }
 
