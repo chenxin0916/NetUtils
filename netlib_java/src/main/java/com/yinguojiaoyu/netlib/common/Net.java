@@ -5,6 +5,7 @@ import android.content.Context;
 import com.ihsanbal.logging.Level;
 import com.ihsanbal.logging.LoggingInterceptor;
 import com.yinguojiaoyu.netlib.cache.CacheOperate;
+import com.yinguojiaoyu.netlib.cache.CacheType;
 import com.yinguojiaoyu.netlib.request.GetRequest;
 import com.yinguojiaoyu.netlib.request.PostRequest;
 
@@ -20,7 +21,9 @@ import static android.util.Log.VERBOSE;
 public class Net {
 
     public final OkHttpClient okHttpClient;
-    private static String netBaseUrl = null;
+    private String netBaseUrl = null;
+    private  CacheType mCommonCacheType = CacheType.NO_CACHE;
+    private long mCommonCacheTime = -1;
 
     private static final class InstanceClass {
         private static Net instance = new Net();
@@ -40,23 +43,43 @@ public class Net {
                 .build();
     }
 
-    public static void initCache(Context context) {
+    public Net initCache(Context context) {
         CacheOperate.getInstance().initCacheDataBase(context);
+        return this;
+    }
+
+    public Net setCommonCacheType(CacheType commonCacheType) {
+        mCommonCacheType = commonCacheType;
+        return this;
+    }
+
+    public CacheType getCommonCacheType() {
+        return mCommonCacheType;
+    }
+
+    public long getCommonCacheTime() {
+        return mCommonCacheTime;
+    }
+
+    public Net setCommonCacheTime(long commonCacheTime) {
+        mCommonCacheTime = commonCacheTime;
+        return this;
     }
 
     public static Net getInstance(){
         return InstanceClass.instance;
     }
 
-    public static String getNetBaseUrl() {
+    public String getNetBaseUrl() {
         return netBaseUrl;
     }
 
-    public static void setBaseUrl(String baseUrl){
+    public Net setBaseUrl(String baseUrl){
         if (!baseUrl.startsWith("http")) {
             throw new RuntimeException("base url must start with http or https");
         }
         netBaseUrl = baseUrl;
+        return this;
     }
 
     public static  GetRequest get(String url) {

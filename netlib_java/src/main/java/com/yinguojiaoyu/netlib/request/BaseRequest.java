@@ -33,11 +33,13 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
     protected HashMap<String,Object> paramsMap;
     public BaseRequest(String url) {
         requestBuilder = new Request.Builder();
-        if (Net.getNetBaseUrl() == null) {
+        if (Net.getInstance().getNetBaseUrl() == null) {
             throw new RuntimeException("Base url is null");
         }
 
-        requestUrl = Net.getNetBaseUrl().concat(url);
+        requestUrl = Net.getInstance().getNetBaseUrl().concat(url);
+        mCacheType = Net.getInstance().getCommonCacheType();
+        expireTime = Net.getInstance().getCommonCacheTime();
     }
 
     public BaseRequest addHeader(String name,String value){

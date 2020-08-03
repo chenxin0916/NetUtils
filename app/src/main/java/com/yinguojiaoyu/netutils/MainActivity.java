@@ -8,18 +8,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.yinguojiaoyu.netlib.cache.CacheType;
 import com.yinguojiaoyu.netlib.common.Net;
 import com.yinguojiaoyu.netlib.common.ResponseConvert;
+import com.yinguojiaoyu.netutils.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Net.setBaseUrl("https://app.taohua6.com");
-        Net.initCache(this);
 
-        findViewById(R.id.view_text).setOnClickListener(v -> {
-
+        ActivityMainBinding mainBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mainBinding.getRoot());
+        Net.getInstance().setBaseUrl("https://app.taohua6.com")
+                .initCache(this)
+                .setCommonCacheTime(20*1000)
+                .setCommonCacheType(CacheType.NO_CACHE);
+        mainBinding.viewText.setOnClickListener(v -> {
             Net.post("/app/api/app/v1/account/login")
                     .params("phone","15201426271")
                     .params("msgCode","9999")
@@ -30,12 +33,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(BaseServiceMode<LoginInfo> loginInfoBaseServiceMode) {
                             Log.i("chenxin",loginInfoBaseServiceMode.getData().getName());
-                        }
-
-                        @Override
-                        public void onFailed(Throwable throwable) {
-                            super.onFailed(throwable);
-                            Log.i("chenxin","failed " + throwable.toString());
+                            mainBinding.viewText.setText(loginInfoBaseServiceMode.getData().getBirthday());
                         }
                     });
         });
