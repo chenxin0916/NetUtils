@@ -2,14 +2,14 @@ package com.yinguojiaoyu.netlib.request;
 
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.yinguojiaoyu.netlib.cache.CacheMode;
 import com.yinguojiaoyu.netlib.cache.CacheOperate;
 import com.yinguojiaoyu.netlib.cache.CacheType;
 import com.yinguojiaoyu.netlib.common.HttpUtils;
 import com.yinguojiaoyu.netlib.common.Net;
-import com.yinguojiaoyu.netlib.common.ResponseConvert;
+import com.yinguojiaoyu.netlib.response.BaseResponseConvert;
+import com.yinguojiaoyu.netlib.response.CommonResponseConvert;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -132,11 +132,11 @@ public abstract class BaseRequest implements ObservableOnSubscribe<Response> {
 
     public @NonNull <T> Observable<T> getObservable(Type type){
         return Observable.create(this)
-                .map(new ResponseConvert<T>(type) {});
+                .map(new CommonResponseConvert<T>(type) {});
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public <T>void execute(ResponseConvert<T> responseConvert){
+    public <T>void execute(BaseResponseConvert<T> responseConvert){
         responseConvert.onPrepare();
         CacheMode cachemode = new CacheMode(cacheKey, expireTime, mCacheType);
         cachemode.generateCacheKey(requestUrl, paramsMap);

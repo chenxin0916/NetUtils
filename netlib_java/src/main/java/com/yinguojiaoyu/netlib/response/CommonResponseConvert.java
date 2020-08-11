@@ -1,4 +1,4 @@
-package com.yinguojiaoyu.netlib.common;
+package com.yinguojiaoyu.netlib.response;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,15 +18,15 @@ import io.reactivex.rxjava3.functions.Function;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public abstract class ResponseConvert<T> implements Function<Response,T> {
+public abstract class CommonResponseConvert<T> implements Function<Response,T> {
     private Type type;
     private CacheMode cacheMode = null;
 
-    public ResponseConvert(Type type) {
+    public CommonResponseConvert(Type type) {
         this.type = type;
     }
 
-    public ResponseConvert() {
+    public CommonResponseConvert() {
         this.type = getSuperclassTypeParameter(getClass());
     }
 
@@ -42,9 +42,17 @@ public abstract class ResponseConvert<T> implements Function<Response,T> {
         }
 
         String string = body.string();
-
         T data =  GsonUtils.getInstance().parseJson(string,type);
+        saveCache(string);
+        if (data == null) {
+            throw new Exception("Parse json failed,data is null");
+        }
+        string = null;
+        cacheMode = null;
+        return data;
+    }
 
+    private void saveCache(String string) {
         if ( cacheMode.isSaveCache() && !TextUtils.isEmpty(cacheMode.getCacheKey())) {
             cacheMode.setContent(string);
             cacheMode.setSaveTime(Calendar.getInstance().getTimeInMillis());
@@ -54,16 +62,9 @@ public abstract class ResponseConvert<T> implements Function<Response,T> {
                 CacheOperate.getInstance().addCache(cacheMode);
             }
         }
-
-        if (data == null) {
-            throw new Exception("Parse json failed,data is null");
-        }
-        string = null;
-        cacheMode = null;
-        return data;
     }
 
-     private Type getSuperclassTypeParameter(Class<?> subclass) {
+    private Type getSuperclassTypeParameter(Class<?> subclass) {
         Type superclass = subclass.getGenericSuperclass();
         if (superclass instanceof Class) {
             throw new RuntimeException("Missing type parameter.");
