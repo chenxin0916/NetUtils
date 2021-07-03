@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NetUtils.iml" filepath="$PROJECT_DIR$/NetUtils.iml" group="NetUtils" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="NetUtils/app" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/netlib_java/netlib_java.iml" filepath="$PROJECT_DIR$/.idea/modules/netlib_java/netlib_java.iml" group="NetUtils/netlib_java" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/netlib_kotlin/netlib_kotlin.iml" filepath="$PROJECT_DIR$/.idea/modules/netlib_kotlin/netlib_kotlin.iml" group="NetUtils/netlib_kotlin" />
+      <module fileurl="file://$PROJECT_DIR$/NetUtils.iml" filepath="$PROJECT_DIR$/NetUtils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/NetUtils.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/NetUtils.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/netlib_java/NetUtils.netlib_java.iml" filepath="$PROJECT_DIR$/.idea/modules/netlib_java/NetUtils.netlib_java.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/netlib_kotlin/NetUtils.netlib_kotlin.iml" filepath="$PROJECT_DIR$/.idea/modules/netlib_kotlin/NetUtils.netlib_kotlin.iml" />
     </modules>
   </component>
 </project>

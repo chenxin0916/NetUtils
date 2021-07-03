@@ -57,7 +57,6 @@ public class PostRequest extends BaseRequest {
             }else {
                 jsonRequest = GsonUtils.getInstance().getGson().toJson(requestPar);
             }
-
         }
 
         RequestBody body = RequestBody.create(jsonRequest,JSON);

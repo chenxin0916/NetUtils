@@ -1,9 +1,7 @@
 package com.yinguojiaoyu.netlib;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 
-import java.io.Reader;
 import java.lang.reflect.Type;
 
 public class GsonUtils {

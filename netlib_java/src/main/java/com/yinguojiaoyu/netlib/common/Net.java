@@ -12,7 +12,6 @@ import com.yinguojiaoyu.netlib.request.PostRequest;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 
@@ -26,7 +25,7 @@ public class Net {
     private long mCommonCacheTime = -1;
 
     private static final class InstanceClass {
-        private static Net instance = new Net();
+        private static final Net instance = new Net();
     }
 
     private Net() {

@@ -19,8 +19,6 @@ public class DownloadResponse extends BaseResponseConvert<String> {
     @Override
     protected String handleResponseBody(ResponseBody body) throws IOException, Exception {
         InputStream inputStream = body.byteStream();
-
-
         return null;
     }
 }
